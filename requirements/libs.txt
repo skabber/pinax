@@ -15,6 +15,7 @@ textile
 vobject
 BeautifulSoup
 Markdown
+oauth
 http://developer.yahoo.com/python/samples/ybrowserauth.zip
 http://geopy.googlecode.com/svn/trunk/
 pysqlite

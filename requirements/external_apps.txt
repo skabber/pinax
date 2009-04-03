@@ -39,3 +39,4 @@ http://django-photologue.googlecode.com/files/photologue-2.1.zip
 
 -e git://github.com/brosner/django-openid.git#egg=django-openid
 -e svn+http://django-app-plugins.googlecode.com/svn/trunk#egg=django-app-plugins
+-e git+git://github.com/skabber/django-twitterauth.git#egg=django-twitterauth

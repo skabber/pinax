@@ -30,6 +30,7 @@ urlpatterns = patterns('',
     
     (r'^about/', include('about.urls')),
     (r'^account/', include('account.urls')),
+    (r'^twitterauth/', include('twitterauth.urls')),
     (r'^openid/(.*)', PinaxConsumer()),
     (r'^bbauth/', include('bbauth.urls')),
     (r'^authsub/', include('authsub.urls')),

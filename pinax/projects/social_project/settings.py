@@ -153,6 +153,7 @@ INSTALLED_APPS = (
     'avatar',
     'flag',
     'microblogging',
+    'twitterauth',
     'locations',
     'uni_form',
     
@@ -227,6 +228,10 @@ BEHIND_PROXY = False
 FORCE_LOWERCASE_TAGS = True
 
 WIKI_REQUIRES_LOGIN = True
+
+# Uncomment these two lines after getting your twitter oauth app keys
+# TWITTER_CONSUMER_KEY = ''
+# TWITTER_CONSUMER_SECRET = ''
 
 # Uncomment this line after signing up for a Yahoo Maps API key at the
 # following URL: https://developer.yahoo.com/wsregapp/

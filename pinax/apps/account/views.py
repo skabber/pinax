@@ -14,8 +14,9 @@ from account.utils import get_default_redirect
 from account.models import OtherServiceInfo
 from account.forms import SignupForm, AddEmailForm, LoginForm, \
     ChangePasswordForm, SetPasswordForm, ResetPasswordForm, \
-    ChangeTimezoneForm, ChangeLanguageForm, TwitterForm
+    ChangeTimezoneForm, ChangeLanguageForm
 from emailconfirmation.models import EmailAddress, EmailConfirmation
+from twitterauth.views import get_credentials_from_request
 
 association_model = models.get_model('django_openid', 'Association')
 if association_model is not None:
@@ -205,38 +206,37 @@ language_change = login_required(language_change)
 
 def other_services(request, template_name="account/other_services.html"):
     from microblogging.utils import twitter_verify_credentials
-    twitter_form = TwitterForm(request.user)
     twitter_authorized = False
-    if request.method == "POST":
-        twitter_form = TwitterForm(request.user, request.POST)
-
-        if request.POST['actionType'] == 'saveTwitter':
-            if twitter_form.is_valid():
-                from microblogging.utils import twitter_account_raw
-                twitter_account = twitter_account_raw(
-                    request.POST['username'], request.POST['password'])
-                twitter_authorized = twitter_verify_credentials(
-                    twitter_account)
-                if not twitter_authorized:
-                    request.user.message_set.create(
-                        message="Twitter authentication failed")
-                else:
-                    twitter_form.save()
-    else:
-        from microblogging.utils import twitter_account_for_user
-        twitter_account = twitter_account_for_user(request.user)
-        twitter_authorized = twitter_verify_credentials(twitter_account)
-        twitter_form = TwitterForm(request.user)
+    
+    from microblogging.utils import twitter_account_for_user
+    twitter_account = twitter_account_for_user(request.user)
+    twitter_authorized = twitter_verify_credentials(twitter_account)
     return render_to_response(template_name, {
-        "twitter_form": twitter_form,
         "twitter_authorized": twitter_authorized,
     }, context_instance=RequestContext(request))
 other_services = login_required(other_services)
 
+def other_services_twitter_finish(request):
+    # pass the request to the twitterauth app and get back the users credentials
+    accessToken = get_credentials_from_request(request)
+    if accessToken:
+        # save the credentials to OtherServiceInfo
+        update_other_services(request.user,
+            twitter_oauth_key = accessToken.key,
+            twitter_oauth_secret = accessToken.secret,
+        )
+        request.user.message_set.create(message=ugettext(u"Successfully authenticated."))
+    else:
+        request.user.message_set.create(
+            message=ugettext(u"Twitter authorization failed.")
+        )
+ 
+    return HttpResponseRedirect(reverse("acct_other_services"))
+
 def other_services_remove(request):
     # TODO: this is a bit coupled.
     OtherServiceInfo.objects.filter(user=request.user).filter(
-        Q(key="twitter_user") | Q(key="twitter_password")
+        Q(key="twitter_oauth_key") | Q(key="twitter_oauth_secret")
     ).delete()
     request.user.message_set.create(message=ugettext(u"Removed twitter account information successfully."))
     return HttpResponseRedirect(reverse("acct_other_services"))

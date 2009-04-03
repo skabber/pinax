@@ -8,7 +8,6 @@
 
 <h1>{% trans "Other Services" %}</h1>
 <h3><a href="#" onclick="$('#TwitterForm').toggle();">{% trans "Twitter" %}</a></h3>
-<form  action="" method="POST" name="TwitterForm" id="TwitterForm">
   {% if twitter_authorized %}
   <p style="background:#C8E8FB">
     {% trans "You have already authorized a twitter account." %}
@@ -16,12 +15,12 @@
     <a href="{% url acct_other_services_remove %}">Delete</a> and start over.
   
 {% endif %}
+<form  action="{% url twitterauth_start %}" method="POST" name="TwitterForm" id="TwitterForm">
 <table>
-  {{ twitter_form }}
   <tr>
       <td>&nbsp;</td>
       <td><input id="actionType" type="hidden" name="actionType" value="saveTwitter" />
-      <input type="submit" value="{% trans "save" %}"/></td></tr>
+      <input type="submit" value="{% trans "authorize twitter" %}"/></td></tr>
 </table>
         <label for="SaveTwitter"></label>
 </form>

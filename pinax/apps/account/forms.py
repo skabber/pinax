@@ -268,24 +268,3 @@ class ChangeLanguageForm(AccountForm):
         self.account.save()
         self.user.message_set.create(message=ugettext(u"Language successfully updated."))
 
-
-# @@@ these should somehow be moved out of account or at least out of this module
-
-from account.models import OtherServiceInfo, other_service, update_other_services
-
-class TwitterForm(UserForm):
-    username = forms.CharField(label=_("Username"), required=True)
-    password = forms.CharField(label=_("Password"), required=True,
-                               widget=forms.PasswordInput(render_value=False))
-
-    def __init__(self, *args, **kwargs):
-        super(TwitterForm, self).__init__(*args, **kwargs)
-        self.initial.update({"username": other_service(self.user, "twitter_user")})
-
-    def save(self):
-        from microblogging.utils import get_twitter_password
-        update_other_services(self.user,
-            twitter_user = self.cleaned_data['username'],
-            twitter_password = get_twitter_password(settings.SECRET_KEY, self.cleaned_data['password']),
-        )
-        self.user.message_set.create(message=ugettext(u"Successfully authenticated."))
